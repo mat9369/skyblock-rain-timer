@@ -29,10 +29,6 @@
             <td>Next thunderstorm : </td>
             <td id="nextThunderstorm"></td>
         </tr>
-        <tr>
-            <td>test : </td>
-            <td id="test"></td>
-        </tr>
     </table>
 
     <script>
@@ -70,7 +66,6 @@
             }
             
         }
-        document.getElementById('test').textContent = new Date().getTime();
         rainTimer()
         setInterval('rainTimer()', 10);
         
