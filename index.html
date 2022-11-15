@@ -4,45 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Spider's Den Rain Timer</title>
-    <script>
-        function secsToTime(num) {
-            var hours = Math.floor(num / 3600);
-            var minutes = Math.floor((num - (hours * 3600)) / 60);
-            var seconds = num - (hours * 3600) - (minutes * 60);
-            if (hours < 10) { hours = "0" + hours; }
-            if (minutes < 10) { minutes = "0" + minutes; }
-            if (seconds < 10) { seconds = "0" + seconds; }
-            return hours + ':' + minutes + ':' + seconds;
-        }
-        function rainTimer() {
-            const UTCPrevThunderstorm = 1668474355000;
-            const UTCNow = new Date().getTime();
-            const base = Math.floor((UTCNow - UTCPrevThunderstorm) / 1000);
-            const thunderstorm = base % ((3850 + 1000) * 4);
-            const rain = thunderstorm % (3850 + 1000);
-            document.getElementById('timeLeft').textContent = "--:--:--";
-            if (rain < 3850) {
-                document.getElementById('rainNow').textContent = "No";
-                document.getElementById('nextRain').textContent = secsToTime(3850 - rain);
-            } else {
-                document.getElementById('rainNow').textContent = "Yes";
-                document.getElementById('timeLeft').textContent = secsToTime(3850 + 1000 - rain);
-                document.getElementById('nextRain').textContent = secsToTime(3850 + 1000 - rain + 3850);
-            }
-            if (thunderstorm < (3850 * 4 + 1000 * 3)) {
-                document.getElementById('thunderstormNow').textContent = "No";
-                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 3 - thunderstorm);
-            } else {
-                document.getElementById('thunderstormNow').textContent = "Yes";
-                document.getElementById('timeLeft').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm);
-                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm + 3850 * 4 + 1000 * 3);
-            }
-        }
-        setInterval('rainTimer()', 1000);
-    </script>
+
 </head>
 
-<body onload="rainTimer()">
+<body>
     <table>
         <tr>
             <td>Rain now? : </td>
@@ -64,7 +29,53 @@
             <td>Next thunderstorm : </td>
             <td id="nextThunderstorm"></td>
         </tr>
+        <tr>
+            <td>test : </td>
+            <td id="test"></td>
+        </tr>
     </table>
+
+    <script>
+        function secsToTime(num) {
+            var hours = Math.floor(num / 3600);
+            var minutes = Math.floor((num - (hours * 3600)) / 60);
+            var seconds = num - (hours * 3600) - (minutes * 60);
+            if (hours < 10) { hours = "0" + hours; }
+            if (minutes < 10) { minutes = "0" + minutes; }
+            if (seconds < 10) { seconds = "0" + seconds; }
+            return hours + ':' + minutes + ':' + seconds;
+        }
+        function rainTimer() {
+            const UTCPrevThunderstorm = 1668474356000;
+            const UTCNow = new Date().getTime();
+            const base = Math.floor((UTCNow - UTCPrevThunderstorm) / 1000);
+            const thunderstorm = base % ((3850 + 1000) * 4);
+            const rain = thunderstorm % (3850 + 1000);
+            document.getElementById('timeLeft').textContent = "00:00:00";
+            if (rain <= 3850) {
+                document.getElementById('rainNow').textContent = "No";
+                document.getElementById('nextRain').textContent = secsToTime(3850 - rain);
+            } else {
+                document.getElementById('rainNow').textContent = "Yes";
+                document.getElementById('timeLeft').textContent = secsToTime(3850 + 1000 - rain);
+                document.getElementById('nextRain').textContent = secsToTime(3850 + 1000 - rain + 3850);
+            }
+            if (thunderstorm < (3850 * 4 + 1000 * 3)) {
+                document.getElementById('thunderstormNow').textContent = "No";
+                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 3 - thunderstorm);
+            } else {
+                document.getElementById('thunderstormNow').textContent = "Yes";
+                document.getElementById('timeLeft').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm);
+                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm + 3850 * 4 + 1000 * 3);
+            }
+            
+        }
+        document.getElementById('test').textContent = new Date().getTime();
+        rainTimer()
+        setInterval('rainTimer()', 10);
+        
+        
+    </script>
 </body>
 
 </html>
