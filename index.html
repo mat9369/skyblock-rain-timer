@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Spider's Den Rain Timer</title>
@@ -23,11 +24,11 @@
             </tr>
             <tr>
                 <td>Next rain : </td>
-                <td id="nextRain">00:24:26</td>
+                <td id="nextRain">00:00:00</td>
             </tr>
             <tr>
                 <td>Next thunderstorm : </td>
-                <td id="nextThunderstorm">04:26:56</td>
+                <td id="nextThunderstorm">00:00:00</td>
             </tr>
         </tbody>
     </table>
@@ -36,16 +37,15 @@
         The code has been redesigned and the behavior may be incorrect.<br>
         If it is wrong, please contact us at https://hypixel.net/conversations/add?to=mat9369<br>
         <br>
-        Sorry, this code is not working right now.<br>
-        Mainly the timer for thunderstorms is not working properly.<br>
-        It will take some more time to rewrite it.<br>
+        There is a high possibility that there is a glitch at the moment.<br>
+        I am currently checking to see if it is working correctly
     </p>
 
     <script>
         // The weather cycle for spider den starts at the start of the skyblock (timestamp 1560275700) and repeats 
         // Sunny -> Thunderstorm -> Sunny -> Rain -> Sunny -> Rain -> Sunny -> Rain
-        // Sunny: 2400sec
-        // Rain and Thunderstorm: 1200sec
+        // Sunny: 2400secs
+        // Rain and Thunderstorm: 1200secs
 
         // "https://wiki.hypixel.net/Spider's_Den"
         // "https://wiki.hypixel.net/index.php?title=Spider%27s_Den&oldid=169056"
@@ -56,17 +56,20 @@
         const cooldown = 2400;
         const duration = 1200;
 
+        // "https://wiki.hypixel.net/Spider's_Den"
+        // "Every 4th time it rains it will thunderstorm."
+        // Possibly 3 is more correct.
+        const thunderstormInterval = 3;
+
         function rainTimer() {
+            // "https://stackoverflow.com/a/221297"
             const timestamp = Math.floor(Date.now() / 1000);
             // "https://wiki.hypixel.net/SkyBlock_Time"
             // "The epoch starting SkyBlock Time is 1,560,275,700,000"
             const skyblockAge = (timestamp - 1560275700);
 
+            const thunderstorm = skyblockAge % ((cooldown + duration) * thunderstormInterval);
             const rain = skyblockAge % (cooldown + duration);
-            // "https://wiki.hypixel.net/Spider's_Den"
-            // "Every 4th time it rains it will thunderstorm."
-            const thunderstorm = skyblockAge % ((cooldown + duration) * 4);
-
             document.getElementById('timeLeft').textContent = secsToTime(0);
 
             if (cooldown <= rain) {
@@ -79,19 +82,18 @@
                 document.getElementById('nextRain').textContent = secsToTime(cooldown - rain);
             }
 
-            
             if ((cooldown <= thunderstorm) && (thunderstorm < (cooldown + duration))) {
                 document.getElementById('thunderstormNow').textContent = "Yes";
-                let timeLeft = (cooldown + duration) - rain; 
+                let timeLeft = (cooldown + duration) - rain;
                 document.getElementById('timeLeft').textContent = secsToTime(timeLeft);
-                document.getElementById('nextThunderstorm').textContent = secsToTime(timeLeft + ((cooldown + duration) * 3) + cooldown);
+                document.getElementById('nextThunderstorm').textContent = secsToTime(timeLeft + ((cooldown + duration) * (thunderstormInterval - 1)) + cooldown);
             } else {
                 document.getElementById('thunderstormNow').textContent = "No";
                 let nextThunderstorm;
-                if(thunderstorm < cooldown){
+                if (thunderstorm < cooldown) {
                     nextThunderstorm = cooldown - thunderstorm;
-                } else if((cooldown + duration) <= thunderstorm ){
-                    nextThunderstorm = ((cooldown + duration) * 3) - thunderstorm + cooldown;
+                } else if ((cooldown + duration) <= thunderstorm) {
+                    nextThunderstorm = ((cooldown + duration) * thunderstormInterval) - thunderstorm + cooldown;
                 }
                 document.getElementById('nextThunderstorm').textContent = secsToTime(nextThunderstorm);
             }
@@ -102,8 +104,9 @@
             return new Date(seconds * 1000).toISOString().slice(11, 19);
         }
 
-        rainTimer()
+        rainTimer();
         setInterval('rainTimer()', 100);
     </script>
 </body>
+
 </html>
