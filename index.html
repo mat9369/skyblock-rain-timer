@@ -1,85 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Spider's Den Rain Timer</title>
-
 </head>
 
 <body>
     <table>
-        <tr>
-            <td>Rain now? : </td>
-            <td id="rainNow"></td>
-        </tr>
-        <tr>
-            <td>Thunderstorm now? : </td>
-            <td id="thunderstormNow"></td>
-        </tr>
-        <tr>
-            <td>Time left : </td>
-            <td id="timeLeft"></td>
-        </tr>
-        <tr>
-            <td>Next rain : </td>
-            <td id="nextRain"></td>
-        </tr>
-        <tr>
-            <td>Next thunderstorm : </td>
-            <td id="nextThunderstorm"></td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>Rain now? : </td>
+                <td id="rainNow">No</td>
+            </tr>
+            <tr>
+                <td>Thunderstorm now? : </td>
+                <td id="thunderstormNow">No</td>
+            </tr>
+            <tr>
+                <td>Time left : </td>
+                <td id="timeLeft">00:00:00</td>
+            </tr>
+            <tr>
+                <td>Next rain : </td>
+                <td id="nextRain">00:24:26</td>
+            </tr>
+            <tr>
+                <td>Next thunderstorm : </td>
+                <td id="nextThunderstorm">04:26:56</td>
+            </tr>
+        </tbody>
     </table>
-
     <p>
-        The timer is currently incorrect due to the skyblock update of a few days ago.<br>
-        I will re-measure the rain intervals and readjust the timer in the next few days.<br>
-        (I used a translation site)<br>
-        <br>
-        https://hypixel.net/threads/skyblock-patch-0-19-3-crystal-hollows-qol-bug-fixes.5465058/<br>
-        "Increased how often it rains in the Spider’s Den."
+        (2023/8/24) Timer has been updated.<br>
+        The code has been redesigned and the behavior may be incorrect.<br>
+        If it is wrong, please contact us at https://hypixel.net/conversations/add?to=mat9369
     </p>
 
     <script>
-        function secsToTime(num) {
-            var hours = Math.floor(num / 3600);
-            var minutes = Math.floor((num - (hours * 3600)) / 60);
-            var seconds = num - (hours * 3600) - (minutes * 60);
-            if (hours < 10) { hours = "0" + hours; }
-            if (minutes < 10) { minutes = "0" + minutes; }
-            if (seconds < 10) { seconds = "0" + seconds; }
-            return hours + ':' + minutes + ':' + seconds;
-        }
+        // The weather cycle for spider den starts at the start of the skyblock (timestamp 1560275700) and repeats 
+        // Sunny -> Thunderstorm -> Sunny -> Rain -> Sunny -> Rain -> Sunny -> Rain
+        // Sunny: 2400sec
+        // Rain and Thunderstorm: 1200sec
+
+        // "https://wiki.hypixel.net/Spider's_Den"
+        // "https://wiki.hypixel.net/index.php?title=Spider%27s_Den&oldid=169056"
+        // "This happens once every 3,850 seconds, and lasts for 1,000 seconds."
+        // "https://hypixel.net/threads/skyblock-patch-0-19-3-crystal-hollows-qol-bug-fixes.5465058/"
+        // "Increased how often it rains in the Spider’s Den."
+        // 3850 -> 2400, 1000 -> 1200
+        const cooldown = 2400;
+        const duration = 1200;
+
         function rainTimer() {
-            const UTCPrevThunderstorm = 1668474356000;
-            const UTCNow = new Date().getTime();
-            const base = Math.floor((UTCNow - UTCPrevThunderstorm) / 1000);
-            const thunderstorm = base % ((3850 + 1000) * 4);
-            const rain = thunderstorm % (3850 + 1000);
-            document.getElementById('timeLeft').textContent = "00:00:00";
-            if (rain <= 3850) {
-                document.getElementById('rainNow').textContent = "No";
-                document.getElementById('nextRain').textContent = secsToTime(3850 - rain);
-            } else {
+            const timestamp = Math.floor(Date.now() / 1000);
+            // "https://wiki.hypixel.net/SkyBlock_Time"
+            // "The epoch starting SkyBlock Time is 1,560,275,700,000"
+            const skyblockAge = (timestamp - 1560275700);
+
+            const rain = skyblockAge % (cooldown + duration);
+            // "https://wiki.hypixel.net/Spider's_Den"
+            // "Every 4th time it rains it will thunderstorm."
+            const thunderstorm = skyblockAge % ((cooldown + duration) * 4);
+
+            document.getElementById('timeLeft').textContent = secsToTime(0);
+
+            if (cooldown <= rain) {
                 document.getElementById('rainNow').textContent = "Yes";
-                document.getElementById('timeLeft').textContent = secsToTime(3850 + 1000 - rain);
-                document.getElementById('nextRain').textContent = secsToTime(3850 + 1000 - rain + 3850);
-            }
-            if (thunderstorm < (3850 * 4 + 1000 * 3)) {
-                document.getElementById('thunderstormNow').textContent = "No";
-                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 3 - thunderstorm);
+                let timeLeft = (cooldown + duration) - rain;
+                document.getElementById('timeLeft').textContent = secsToTime(timeLeft);
+                document.getElementById('nextRain').textContent = secsToTime(timeLeft + cooldown);
             } else {
-                document.getElementById('thunderstormNow').textContent = "Yes";
-                document.getElementById('timeLeft').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm);
-                document.getElementById('nextThunderstorm').textContent = secsToTime(3850 * 4 + 1000 * 4 - thunderstorm + 3850 * 4 + 1000 * 3);
+                document.getElementById('rainNow').textContent = "No";
+                document.getElementById('nextRain').textContent = secsToTime(cooldown - rain);
             }
+
             
+            if ((cooldown <= thunderstorm) && (thunderstorm < (cooldown + duration))) {
+                document.getElementById('thunderstormNow').textContent = "Yes";
+                let timeLeft = (cooldown + duration) - rain; 
+                document.getElementById('timeLeft').textContent = secsToTime(timeLeft);
+                document.getElementById('nextThunderstorm').textContent = secsToTime(timeLeft + ((cooldown + duration) * 3) + cooldown);
+            } else {
+                document.getElementById('thunderstormNow').textContent = "No";
+                let nextThunderstorm;
+                if(thunderstorm < cooldown){
+                    nextThunderstorm = cooldown - thunderstorm;
+                } else if((cooldown + duration) <= thunderstorm ){
+                    nextThunderstorm = ((cooldown + duration) * 3) - thunderstorm + cooldown;
+                }
+                document.getElementById('nextThunderstorm').textContent = secsToTime(nextThunderstorm);
+            }
         }
+
+        function secsToTime(seconds) {
+            // "https://stackoverflow.com/a/25279340"
+            return new Date(seconds * 1000).toISOString().slice(11, 19);
+        }
+
         rainTimer()
-        setInterval('rainTimer()', 10);
-        
-        
+        setInterval('rainTimer()', 100);
     </script>
 </body>
-
 </html>
