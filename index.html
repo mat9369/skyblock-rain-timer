@@ -32,33 +32,23 @@
             </tr>
         </tbody>
     </table>
-    <p>
-        (2023/8/24) Timer has been updated.<br>
-        The code has been redesigned and the behavior may be incorrect.<br>
-        If it is wrong, please contact us at https://hypixel.net/conversations/add?to=mat9369<br>
-        <br>
-        There is a high possibility that there is a glitch at the moment.<br>
-        I am currently checking to see if it is working correctly
-    </p>
-
+    <p>08-25-2023 Updated timer code.</p>
     <script>
         // The weather cycle for spider den starts at the start of the skyblock (timestamp 1560275700) and repeats 
-        // Sunny -> Thunderstorm -> Sunny -> Rain -> Sunny -> Rain -> Sunny -> Rain
+        // Sunny -> Thunderstorm -> Sunny -> Rain -> Sunny -> Rain
         // Sunny: 2400secs
         // Rain and Thunderstorm: 1200secs
 
         // "https://wiki.hypixel.net/Spider's_Den"
         // "https://wiki.hypixel.net/index.php?title=Spider%27s_Den&oldid=169056"
-        // "This happens once every 3,850 seconds, and lasts for 1,000 seconds."
+        // "This happens once every 3,850 seconds, and lasts for 1,000 seconds. Every 4th time it rains it will thunderstorm."
         // "https://hypixel.net/threads/skyblock-patch-0-19-3-crystal-hollows-qol-bug-fixes.5465058/"
         // "Increased how often it rains in the Spider’s Den."
-        // 3850 -> 2400, 1000 -> 1200
+        // 3850 seconds -> 2400 seconds
+        // 1000 seconds -> 1200 seconds
+        // Every 4th time -> Every 3th time
         const cooldown = 2400;
         const duration = 1200;
-
-        // "https://wiki.hypixel.net/Spider's_Den"
-        // "Every 4th time it rains it will thunderstorm."
-        // Possibly 3 is more correct.
         const thunderstormInterval = 3;
 
         function rainTimer() {
